@@ -5,8 +5,20 @@ static Window *s_main_window;
 static TextLayer *s_time_layer;
 static TextLayer *s_initial_time_layer;
 
-static time_t *static_time;
+// static time_t *static_time;
 static time_t init_time;
+
+static void set_and_display_initial_time() {
+  init_time = time(NULL); // store time when watchface was launched
+  // static_time = &init_time;
+  
+  static char initial_time_text[] = "00:00";
+  struct tm *initial_time = localtime(&init_time);
+  
+  strftime(initial_time_text, sizeof("00:00"), "%I:%M", initial_time);
+  
+  text_layer_set_text(s_initial_time_layer, initial_time_text);
+}
 
 static void update_time() {
   time_t temp = time(NULL);
@@ -25,18 +37,11 @@ static void update_time() {
   
   // display buffer on TextLayer
   text_layer_set_text(s_time_layer, buffer);
-}
-
-static void set_and_display_initial_time() {
-  init_time = time(NULL); // store time when watchface was launched
-  static_time = &init_time;
+  double seconds = difftime(temp, init_time); 
   
-  static char initial_time_text[] = "00:00";
-  struct tm *init_time = localtime(static_time);
-  
-  strftime(initial_time_text, sizeof("00:00"), "%I:%M", init_time);
-  
-  text_layer_set_text(s_initial_time_layer, initial_time_text);
+  if (seconds > 120) {
+    set_and_display_initial_time();
+  } 
 }
 
 static void main_window_load(Window *window) {
