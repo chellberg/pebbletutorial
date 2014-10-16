@@ -9,27 +9,33 @@ static time_t *static_time;
 static time_t init_time;
 
 static void update_time() {
-  
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
-  struct tm *init_time = localtime(static_time);
   
   // create long-lived buffer to store current time
   static char buffer[] = "00:00";
-  static char initial_time_text[] = "00:00";
   
   // write time into buffer
   if(clock_is_24h_style() == true) {
     strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
-    strftime(initial_time_text, sizeof("00:00"), "%H:%M", init_time);
-    //   where string is - how long - what kind - where time is
+    //    which string - what size - which format - loc of time struct
   } else {
     strftime(buffer, sizeof("00:00"), "%I:%M", tick_time);
-    strftime(initial_time_text, sizeof("00:00"), "%I:%M", init_time);
   }
   
   // display buffer on TextLayer
   text_layer_set_text(s_time_layer, buffer);
+}
+
+static void set_and_display_initial_time() {
+  init_time = time(NULL); // store time when watchface was launched
+  static_time = &init_time;
+  
+  static char initial_time_text[] = "00:00";
+  struct tm *init_time = localtime(static_time);
+  
+  strftime(initial_time_text, sizeof("00:00"), "%I:%M", init_time);
+  
   text_layer_set_text(s_initial_time_layer, initial_time_text);
 }
 
@@ -53,8 +59,8 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_initial_time_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
   
-  init_time = time(NULL); // store time when watchface was launched
-  static_time = &init_time;
+  
+  set_and_display_initial_time();
 } 
 
 static void main_window_unload(Window *window) { // destroy what you created in main_window_load
