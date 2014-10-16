@@ -48,7 +48,7 @@ static void update_time() {
   text_layer_set_text(s_time_layer, buffer);
   double seconds = difftime(temp, init_time); 
   
-  if (seconds > 61) {
+  if (seconds > 2700) {
     set_and_display_initial_time();
     show_reminder_text();
     vibes_double_pulse();
@@ -88,7 +88,7 @@ static void main_window_load(Window *window) {
   text_layer_set_font(s_reminder_layer, fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21));
   text_layer_set_text_alignment(s_reminder_layer, GTextAlignmentCenter);  // add s_time_layer as a child layer of window's root layer
   
-  text_layer_set_text(s_reminder_layer, "REMINDER");
+  text_layer_set_text(s_reminder_layer, "Go for a walk!");
   
   // add text layers to window
   
